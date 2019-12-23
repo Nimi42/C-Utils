@@ -5,6 +5,6 @@ sample.o: sample.c .FORCE
 	gcc -c sample.c
 
 multiline.o: multiline.c .FORCE
-	gcc -g -c multiline.c
+	gcc -c multiline.c
 
 .FORCE:
