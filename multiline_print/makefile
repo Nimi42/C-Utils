@@ -1,10 +1,32 @@
-multiline.out: sample.o multiline.o
-	gcc -o multiline.out sample.o multiline.o
+BUILD = build
+BUILD_TREE := $(dir $(addprefix $(BUILD)/, $(wildcard */*/*.c)))
+BINARY = libmultiline.a
+EXAMPLE = example.out
 
-sample.o: sample.c .FORCE
-	gcc -c sample.c
+ALL_SOURCES := $(wildcard */*/*.c)
+ALL_OBJ := $(addprefix $(BUILD)/,$(ALL_SOURCES:%.c=%.o))
 
-multiline.o: multiline.c .FORCE
-	gcc -g -c multiline.c
+LIB_SOURCES := $(filter-out %example.c, $(ALL_SOURCES))
+LIB_BUILD := $(addprefix $(BUILD)/,$(LIB_SOURCES:%.c=%.o))
 
-.FORCE:
+INCLUDE_DIRS = $(wildcard */*/include)
+I_FLAG := $(INCLUDE_DIRS:%=-I%)
+
+.PHONY: all
+
+all: $(BUILD)/$(BINARY) $(BUILD)/$(EXAMPLE)
+
+$(BUILD)/$(BINARY): $(LIB_BUILD)
+	ar rcs $@ $< 
+
+$(BUILD)/$(EXAMPLE): $(ALL_OBJ)
+	gcc -o $@ $^
+
+$(ALL_OBJ): $(BUILD)/%.o: %.c | $(BUILD_TREE)
+	gcc $(I_FLAG) -c $< -o $@
+
+$(BUILD_TREE):
+	@ mkdir -p $@
+
+clean:
+	rm -Rf $(BUILD)
