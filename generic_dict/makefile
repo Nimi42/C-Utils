@@ -1,6 +1,6 @@
 BUILD = build
 BUILD_TREE := $(dir $(addprefix $(BUILD)/, $(wildcard */*/*.c)))
-BINARY = libmultiline.a
+BINARY = libStrIntDict.a
 EXAMPLE = example.out
 
 ALL_SOURCES := $(wildcard */*/*.c)
@@ -12,13 +12,15 @@ LIB_BUILD := $(addprefix $(BUILD)/,$(LIB_SOURCES:%.c=%.o))
 INCLUDE_DIRS = $(wildcard */*/include)
 I_FLAG := $(INCLUDE_DIRS:%=-I%)
 
+LDFLAGS := -lm
+
 all: $(BUILD)/$(BINARY) $(BUILD)/$(EXAMPLE)
 
 $(BUILD)/$(BINARY): $(LIB_BUILD)
-	ar rcs $@ $< 
+	ar rcs $@ $^ 
 
 $(BUILD)/$(EXAMPLE): $(ALL_OBJ)
-	gcc -o $@ $^
+	gcc -o $@ $^ $(LDFLAGS)
 
 $(ALL_OBJ): $(BUILD)/%.o: %.c | $(BUILD_TREE)
 	gcc $(I_FLAG) -c $< -o $@
