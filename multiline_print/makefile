@@ -12,6 +12,8 @@ LIB_BUILD := $(addprefix $(BUILD)/,$(LIB_SOURCES:%.c=%.o))
 INCLUDE_DIRS = $(wildcard */*/include)
 I_FLAG := $(INCLUDE_DIRS:%=-I%)
 
+ERRORS := -Wall -Wextra -Werror
+
 all: $(BUILD)/$(BINARY) $(BUILD)/$(EXAMPLE)
 
 $(BUILD)/$(BINARY): $(LIB_BUILD)
@@ -21,7 +23,7 @@ $(BUILD)/$(EXAMPLE): $(ALL_OBJ)
 	gcc -o $@ $^
 
 $(ALL_OBJ): $(BUILD)/%.o: %.c | $(BUILD_TREE)
-	gcc $(I_FLAG) -c $< -o $@
+	gcc $(ERRORS) $(I_FLAG) -c $< -o $@ -Wall -Werror -pedantic
 
 $(BUILD_TREE):
 	@ mkdir -p $@

@@ -34,7 +34,7 @@ static void free_lines(void) {
 	while (head != NULL) {
 		tmp = head;
 		head = head->next;
-		for (int i = 0; i < tmp->lines; ++i) {
+		for (unsigned i = 0; i < tmp->lines; ++i) {
 			free(tmp->content[i]);
 		}
 		free(tmp->content);
@@ -44,9 +44,9 @@ static void free_lines(void) {
 	g_lines = NULL;
 }
 
-static struct Column * to_column_seq(char *block, char delim) {
+static struct Column * to_column_seq(const char *block, char delim) {
 	char c;
-	int i, j;
+	unsigned i, j;
 	unsigned num_chars = 0, num_lines = 0;
 
 	j = 0;
@@ -104,7 +104,7 @@ static void append(struct Column *col) {
 	}
 }
 
-void ml_append(char *seq, char delim){
+void ml_append(const char *seq, char delim){
 	append(to_column_seq(seq, delim));
 }
 

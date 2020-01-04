@@ -13,6 +13,7 @@ INCLUDE_DIRS = $(wildcard */*/include)
 I_FLAG := $(INCLUDE_DIRS:%=-I%)
 
 LDFLAGS := -lm
+ERRORS := -Wall -Wextra -Werror
 
 all: $(BUILD)/$(BINARY) $(BUILD)/$(EXAMPLE)
 
@@ -23,7 +24,7 @@ $(BUILD)/$(EXAMPLE): $(ALL_OBJ)
 	gcc -o $@ $^ $(LDFLAGS)
 
 $(ALL_OBJ): $(BUILD)/%.o: %.c | $(BUILD_TREE)
-	gcc $(I_FLAG) -c $< -o $@
+	gcc $(ERRORS) $(I_FLAG) -c $< -o $@
 
 $(BUILD_TREE):
 	@ mkdir -p $@
