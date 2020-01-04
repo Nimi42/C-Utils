@@ -1,3 +1,7 @@
 .idea
 *.o
 *.out
+*.sublime-project
+*.sublime-workspace
+
+**/build

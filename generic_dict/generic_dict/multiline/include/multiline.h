@@ -5,9 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ARROW_SIZE 7
-
-void append_column(char *seq, char delim);
-void flush(void);
+void ml_append(char *seq, char delim);
+void ml_flush(char offset);
 
 #endif // MULTILINE_PRINT_H

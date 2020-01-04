@@ -1,4 +1,4 @@
-#include "multiline.h"
+#include "include/multiline.h"
 
 struct Lines {
 	unsigned count;
@@ -13,7 +13,7 @@ struct Column {
 	struct Column *next;
 };
 
-static struct Lines *lines = NULL;
+static struct Lines *g_lines = NULL;
 
 static const char ARROW_BLANK[8] = "       ";
 static const char ARROW[8] = "  -->  ";
@@ -29,7 +29,7 @@ static struct Column * new_column(unsigned num_lines, unsigned num_chars) {
 }
 
 static void free_lines(void) {
-	struct Column *head = lines->head;
+	struct Column *head = g_lines->head;
 	struct Column *tmp;
 	while (head != NULL) {
 		tmp = head;
@@ -40,11 +40,11 @@ static void free_lines(void) {
 		free(tmp->content);
 		free(tmp);
 	}
-	free(lines);
-	lines = NULL;
+	free(g_lines);
+	g_lines = NULL;
 }
 
-static struct Column * to_column(char *block, char delim) {
+static struct Column * to_column_seq(char *block, char delim) {
 	char c;
 	int i, j;
 	unsigned num_chars = 0, num_lines = 0;
@@ -69,8 +69,8 @@ static struct Column * to_column(char *block, char delim) {
 
 	col->lines = num_lines;	
 
-	c = *block++;
 	for (i = 0; i < num_lines; ++i) {
+		c = *block++;
 		seq = malloc((num_chars + 1) * sizeof(char));
 		for (j = 0; j < num_chars; ++j) {
 			if (c == delim || c == '\0') {
@@ -80,7 +80,6 @@ static struct Column * to_column(char *block, char delim) {
 				c = *block++;
 			}
 		}
-		c = *block++;
 		seq[j] = '\0';
 		col->content[i] = seq;
 	}
@@ -88,32 +87,36 @@ static struct Column * to_column(char *block, char delim) {
 	return col;
 }
 
-void append_column(char *seq, char delim) {
-	if (lines == NULL) {
-		lines = malloc(sizeof(struct Lines));
+static void append(struct Column *col) {
+	if (g_lines == NULL) {
+		g_lines = malloc(sizeof(struct Lines));
 
-		struct Column *col =to_column(seq, delim);
-		lines->count = col->lines;
-		lines->head = col;
-		lines->toe = lines->head;
+		g_lines->count = col->lines;
+		g_lines->head = col;
+		g_lines->toe = g_lines->head;
 	} else {
-		struct Column *col = to_column(seq, delim);
-		if (lines->count < col->lines) {
-			lines->count = col->lines;
+		
+		if (g_lines->count < col->lines) {
+			g_lines->count = col->lines;
 		}
-		lines->toe->next = col;
-		lines->toe = col;
+		g_lines->toe->next = col;
+		g_lines->toe = col;
 	}
 }
 
-void flush(void) {
-	if (lines != NULL) {
+void ml_append(char *seq, char delim){
+	append(to_column_seq(seq, delim));
+}
+
+void ml_flush(char offset) {
+	if (g_lines != NULL) {
 		struct Column *head;
-		unsigned half = (lines->count / 2) + ((lines->count % 2) - 1);
+		unsigned num_lines = g_lines->count;
+		unsigned half = (num_lines / 2) + ((num_lines % 2) - 1);
 
-
-		for (unsigned i = 0; i < lines->count; ++i) {
-			head = lines->head;
+		for (unsigned i = 0; i < num_lines; ++i) {
+			printf("%c", offset);		
+			head = g_lines->head;
 			if (head->lines > i) {
 				printf("%s", head->content[i]);
 			} else {
@@ -141,10 +144,8 @@ void flush(void) {
 				}
 				head = head->next;
 			}
-
 			printf("\n");
 		}
-
 		free_lines();
 	}	
 }
