@@ -15,7 +15,7 @@ I_FLAG := $(INCLUDE_DIRS:%=-I%)
 all: $(BUILD)/$(BINARY) $(BUILD)/$(EXAMPLE)
 
 $(BUILD)/$(BINARY): $(LIB_BUILD)
-	ar rcs $@ $< 
+	ar rcs $@ $<
 
 $(BUILD)/$(EXAMPLE): $(ALL_OBJ)
 	gcc -o $@ $^
